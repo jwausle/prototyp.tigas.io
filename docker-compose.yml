@@ -1,0 +1,73 @@
+version: "3.4"
+
+services:
+
+  traefik:
+    image: "traefik:v2.0"
+    container_name: "traefik"
+    hostname: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80" # exposed port:80 as ref:web
+    ports:
+      - "80:80" # http://subdomain.tigas.io
+      - "8080:8080" # http://tigas.io:8080 as traefik-UI
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  whoami:
+    image: "containous/whoami"
+    container_name: "whoami"
+    hostname: "whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN:-tigas.io}`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+
+  influxdb:
+    image: "influxdb:1.7.8"
+    container_name: "influxdb"
+    hostname: "influxdb"
+    ports:
+      - "8086:8086"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.influxdb.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/i`)"
+      - "traefik.http.routers.influxdb.entrypoints=web"
+      - "traefik.http.services.influxdb-service.loadbalancer.server.port=8086"
+
+  telegraf: # monitor docker_daemon
+    image: telegraf:1.12.1
+    container_name: telegraf
+    hostname: telegraf
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  grafana:
+    image: grafana/grafana:6.3.3
+    container_name: grafana
+    hostname: "grafana"
+    environment:
+      - "GF_SERVER_DOMAIN=grafana"
+      - "GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/g"
+      - "GF_SERVER_ENABLE_GZIP=true"
+      - "GF_SERVER_SERVE_FROM_SUB_PATH=true" # details - https://github.com/grafana/grafana/pull/17048
+      - "GF_AUTH_ANONYMOUS_ORG_ROLE=Admin"
+      - "GF_AUTH_ANONYMOUS_ENABLED=true"
+      - "GF_AUTH_BASIC_ENABLED=false"
+      - "GF_PATHS_PROVISIONING=/etc/grafana/provisioning"
+      - "GF_LOG_LEVEL=debug"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/g`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana-service.loadbalancer.server.port=3000"
