@@ -34,7 +34,7 @@ services:
     hostname: "influxdb"
     restart: always
     ports:
-      - "8086:8086"
+      - "8086"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.influxdb.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/i`)"
@@ -69,7 +69,7 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
-      - "3000:3000"
+      - "3000"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/g`)"
