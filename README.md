@@ -27,8 +27,8 @@ vagrant@ubuntu-bionic:/usr/share/tigas.io $ docker-compose up
 * update `/etc/hosts` on host 
 
 ```
-echo "[VM] tigas.io" >> /etc/hosts
-echo "[VM] sstit.tigas.io" >> /etc/hosts
+echo "[LOCAL_VM_IP] tigas.io" >> /etc/hosts
+echo "[LOCAL_VM_IP] sstit.tigas.io" >> /etc/hosts
 ```
 
 * open [http://sstit.tigas.io/g](http://sstit.tigas.io/g)
