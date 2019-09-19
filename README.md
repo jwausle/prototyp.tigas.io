@@ -31,7 +31,8 @@ echo "[LOCAL_VM_IP] tigas.io" >> /etc/hosts
 echo "[LOCAL_VM_IP] sstit.tigas.io" >> /etc/hosts
 ```
 
-* open [http://sstit.tigas.io/g](http://sstit.tigas.io/g)
+* open [grafana](http://sstit.tigas.io/g) 
+* open [traefik](http://tigas.io:8080) 
 
 ## Deploy
 
