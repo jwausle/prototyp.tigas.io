@@ -37,7 +37,7 @@ services:
       - "8086"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.influxdb.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/i`)"
+      - "traefik.http.routers.influxdb.rule=Host(`${SUBDOMAIN:-sstit}.${DOMAIN:-tigas.io}`) && PathPrefix(`/i`)"
       - "traefik.http.routers.influxdb.entrypoints=web"
       - "traefik.http.services.influxdb-service.loadbalancer.server.port=8086"
 
@@ -72,6 +72,6 @@ services:
       - "3000"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`sstit.${DOMAIN:-tigas.io}`) && PathPrefix(`/g`)"
+      - "traefik.http.routers.grafana.rule=Host(`${SUBDOMAIN:-sstit}.${DOMAIN:-tigas.io}`) && PathPrefix(`/g`)"
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana-service.loadbalancer.server.port=3000"
